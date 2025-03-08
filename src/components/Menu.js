@@ -45,6 +45,8 @@ const navigation = {
   ],
   pages: [
     { name: "Artists", href: "/artists" },
+    { name: "Appointments", href: "/appointments" },
+    { name: "Booking", href: "/booking" },
     { name: "Location", href: "/#location-section" },
   ],
 };
