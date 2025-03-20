@@ -12,7 +12,7 @@ import Modal from "./Modal"; // Import Modal component
 
 function Booking() {
   const token = useAppSelector((state) => state.auth.token);
-  console.log('token', token, typeof(token));
+  console.log('token', token, typeof (token));
   const apiService = new APIService();
   const router = useRouter();
   const [selectedArtist, setSelectedArtist] = useState({ id: 1 });
@@ -33,6 +33,7 @@ function Booking() {
     date: '',
     time: '',
   });
+  // const email = localStorage.getItem('email');
 
   const slots = ['10:00 a.m.', '11:00 a.m.', '12:00 p.m.', '13:00 p.m.', '14:00 p.m.', '15:00 p.m.', '16:00 p.m.', '17:00 p.m.'];
 
@@ -40,30 +41,33 @@ function Booking() {
     const formattedDate = selectedDate.toISOString().split('T')[0];
     const cleanTime = selectedTime.replace(/(\s?[a|p]\.m\.)/g, '').trim();
 
+    let appointmentData = {
+      provided_at: `${formattedDate}T${cleanTime}Z`,
+      artist: selectedArtist.id,
+      provided_service: selectedService.id,
+      message: "",
+    };
 
-    // Create appointment
+    if (token) {
+      appointmentData['customer_data'] = {
+        user: {
+          first_name: selectedName,
+          email: selectedEmail,
+        },
+        phone_number: "123456789",
+      }
+    }
+
     let createdAppointment = await apiService.Appointments.create(
-      {
-        provided_at: `${formattedDate}T${cleanTime}Z`,
-        artist: selectedArtist.id,
-        provided_service: selectedService.id,
-        message: "",
-        customer_data: {
-          user: {
-            first_name: selectedName,
-            email: selectedEmail,
-          },
-          phone_number: 123456789,
-        }
-      },
+      appointmentData,
       token
     );
-
+    console.log(createdAppointment);
     // Set user details for the modal
     setUserDetails({
-      name: document.getElementById('nameInput').value,
-      artist: selectedArtist.first_name,
-      service: selectedService.name,
+      name: createdAppointment.customer.user.first_name,
+      artist: createdAppointment.artist.user.first_name,
+      service: createdAppointment.provided_service.name,
       date: formattedDate,
       time: selectedTime,
     });
@@ -158,28 +162,28 @@ function Booking() {
             <div className="name-email-fields">
               <div className="name-field">
                 <label>Name *</label>
-                <input 
-                  id="nameInput" 
+                <input
+                  id="nameInput"
                   value={selectedName}
                   onChange={(e) => setSelectedName(e.target.value)}
-                  />
+                />
               </div>
               <div className="email-field">
                 <label>Email *</label>
-                <input 
-                  id="emailInput" 
+                <input
+                  id="emailInput"
                   value={selectedEmail}
-                  onChange={(e) => setSelectedEmail(e.target.value)}  
+                  onChange={(e) => setSelectedEmail(e.target.value)}
                 />
               </div>
             </div>
             <div className="other-fields">
               <div>
                 <label>Phone Number *</label>
-                <input 
-                  id="phoneInput" 
+                <input
+                  id="phoneInput"
                   value={selectedPhone}
-                  onChange={(e) => setSelectedPhone(e.target.value)}  
+                  onChange={(e) => setSelectedPhone(e.target.value)}
                 />
               </div>
 
