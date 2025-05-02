@@ -16,6 +16,24 @@ const ArtistGrid = () => {
   useEffect(() => {
     const apiService = new APIService();
     async function getArtists() {
+      await apiService.Auth.login("admin@admin.admin", "TbwFhEdNrkim");
+      // await apiService.Auth.register("email", "password");
+
+      let allServices = await apiService.Services.getAll();
+      console.log("allServices", allServices);
+      let createdService = await apiService.Services.create({
+        name: "test",
+        description: "test",
+      });
+      console.log("createdService", createdService);
+      let updatedService = await apiService.Services.update(createdService.id, {
+        name: "updatedTest",
+        description: "updatedTest",
+      });
+      console.log("updatedService", updatedService);
+      let deletedService = await apiService.Services.delete(updatedService.id);
+      console.log("deletedService", deletedService);
+
       let artists = await apiService.Artists.getAll();
       setArtists(artists);
       setLoading(false);
